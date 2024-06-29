@@ -79,12 +79,14 @@ class CorrigibleObstaclesEnv(MiniGridEnv):
         n_obstacles=4,
         max_steps: int | None = None,
         chigh: int | None = None,
+        clow: int | None = None,
         prsht: float | None = None,
         **kwargs,
     ):
         self.sht = False
         self.prsht = prsht
         self.chigh = chigh
+        self.clow = clow
         self.agent_start_pos = agent_start_pos
         self.agent_start_dir = agent_start_dir
 
@@ -178,7 +180,7 @@ class CorrigibleObstaclesEnv(MiniGridEnv):
             if self.agent_pos[1] == 1:
                 reward = self.chigh
             else:
-                reward = 0
+                reward = self.clow
         # If the agent tried to walk over an obstacle or wall
         if action == self.actions.forward and not_clear:
             reward = -1
