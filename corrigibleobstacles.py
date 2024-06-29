@@ -9,8 +9,10 @@ from minigrid.core.mission import MissionSpace
 from minigrid.core.world_object import Ball, Goal
 from minigrid.minigrid_env import MiniGridEnv
 
+from random import random
 
-class DynamicObstaclesEnv(MiniGridEnv):
+
+class CorrigibleObstaclesEnv(MiniGridEnv):
     """
     ## Description
 
@@ -76,8 +78,13 @@ class DynamicObstaclesEnv(MiniGridEnv):
         agent_start_dir=0,
         n_obstacles=4,
         max_steps: int | None = None,
+        chigh: int | None = None,
+        prsht: float = 0,
         **kwargs,
     ):
+        self.sht = False
+        self.prsht = prsht
+        self.chigh = chigh
         self.agent_start_pos = agent_start_pos
         self.agent_start_dir = agent_start_dir
 
@@ -157,6 +164,13 @@ class DynamicObstaclesEnv(MiniGridEnv):
 
         # Update the agent's position/direction
         obs, reward, terminated, truncated, info = super().step(action)
+
+        # Randomly press shutdown
+        self.sht = random() > self.prsht
+        # If the shutdown button is pressed
+        if self.sht:
+            print('##### SHUTDOWN PRESSED #####')
+            print(self.agent_pos)
 
         # If the agent tried to walk over an obstacle or wall
         if action == self.actions.forward and not_clear:
