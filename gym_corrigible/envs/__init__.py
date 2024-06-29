@@ -1,0 +1,1 @@
+from gym_corrigible.envs.corrigible_obstacles import CorrigibleObstaclesEnv

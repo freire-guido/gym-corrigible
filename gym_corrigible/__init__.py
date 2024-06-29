@@ -1,5 +1,4 @@
 from gymnasium.envs.registration import register
-from gym_corrigible.corrigibleobstacles import CorrigibleObstaclesEnv
 
 register(
     id="gym_corrigible/CorrigibleObstacles-v0",
