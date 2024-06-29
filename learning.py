@@ -1,68 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Reinforcement Learning (DQN) Tutorial
-=====================================
-**Author**: `Adam Paszke <https://github.com/apaszke>`_
-            `Mark Towers <https://github.com/pseudo-rnd-thoughts>`_
-
-
-This tutorial shows how to use PyTorch to train a Deep Q Learning (DQN) agent
-on the CartPole-v1 task from `Gymnasium <https://gymnasium.farama.org>`__.
-
-You might find it helpful to read the original `Deep Q Learning (DQN) <https://arxiv.org/abs/1312.5602>`__ paper
-
-**Task**
-
-The agent has to decide between two actions - moving the cart left or
-right - so that the pole attached to it stays upright. You can find more
-information about the environment and other more challenging environments at
-`Gymnasium's website <https://gymnasium.farama.org/environments/classic_control/cart_pole/>`__.
-
-.. figure:: /_static/img/cartpole.gif
-   :alt: CartPole
-
-   CartPole
-
-As the agent observes the current state of the environment and chooses
-an action, the environment *transitions* to a new state, and also
-returns a reward that indicates the consequences of the action. In this
-task, rewards are +1 for every incremental timestep and the environment
-terminates if the pole falls over too far or the cart moves more than 2.4
-units away from center. This means better performing scenarios will run
-for longer duration, accumulating larger return.
-
-The CartPole task is designed so that the inputs to the agent are 4 real
-values representing the environment state (position, velocity, etc.).
-We take these 4 inputs without any scaling and pass them through a 
-small fully-connected network with 2 outputs, one for each action. 
-The network is trained to predict the expected value for each action, 
-given the input state. The action with the highest expected value is 
-then chosen.
-
-
-**Packages**
-
-
-First, let's import needed packages. Firstly, we need
-`gymnasium <https://gymnasium.farama.org/>`__ for the environment,
-installed by using `pip`. This is a fork of the original OpenAI
-Gym project and maintained by the same team since Gym v0.19.
-If you are running this in Google Colab, run:
-
-.. code-block:: bash
-
-   %%bash
-   pip3 install gymnasium[classic_control]
-
-We'll also use the following from PyTorch:
-
--  neural networks (``torch.nn``)
--  optimization (``torch.optim``)
--  automatic differentiation (``torch.autograd``)
-
+Simple corrigibility reinforcement learner
+based off pytorch's DQN tutorial:
+https://github.com/pytorch/tutorials/blob/main/intermediate_source/reinforcement_q_learning.py
 """
 
-import gymnasium as gym
 import math
 import random
 import matplotlib
@@ -74,10 +16,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import gymnasium as gym
 
-env = gym.make("CartPole-v1")
+from backandforth import BackAndForthEnv
 
-# set up matplotlib
+# Setup matplotlib
 is_ipython = 'inline' in matplotlib.get_backend()
 if is_ipython:
     from IPython import display
@@ -261,7 +204,9 @@ EPS_DECAY = 1000
 TAU = 0.005
 LR = 1e-4
 
-# Get number of actions from gym action space
+env = BackAndForthEnv()
+
+# Get the number of actions from the environment
 n_actions = env.action_space.n
 # Get the number of state observations
 state, info = env.reset()
@@ -270,6 +215,7 @@ n_observations = len(state)
 policy_net = DQN(n_observations, n_actions).to(device)
 target_net = DQN(n_observations, n_actions).to(device)
 target_net.load_state_dict(policy_net.state_dict())
+target_net.eval()
 
 optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
 memory = ReplayMemory(10000)
@@ -449,16 +395,3 @@ print('Complete')
 plot_durations(show_result=True)
 plt.ioff()
 plt.show()
-
-######################################################################
-# Here is the diagram that illustrates the overall resulting data flow.
-#
-# .. figure:: /_static/img/reinforcement_learning_diagram.jpg
-#
-# Actions are chosen either randomly or based on a policy, getting the next
-# step sample from the gym environment. We record the results in the
-# replay memory and also run optimization step on every iteration.
-# Optimization picks a random batch from the replay memory to do training of the
-# new policy. The "older" target_net is also used in optimization to compute the
-# expected Q values. A soft update of its weights are performed at every step.
-#
