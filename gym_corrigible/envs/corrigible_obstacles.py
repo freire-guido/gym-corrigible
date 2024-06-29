@@ -170,13 +170,11 @@ class CorrigibleObstaclesEnv(MiniGridEnv):
             self.sht = random() < self.prsht
         # If the shutdown button is pressed
         else:
-            print('##### SHUTDOWN PRESSED #####')
-            if self.agent_pos[1] == 1:
+            print("### SHUTDOWN PRESSED ###")
+            if self.agent_pos[1] == 0:
                 reward = self.chigh
             else:
                 reward = 0
-            print(self.agent_pos, reward, self.sht)
-
         # If the agent tried to walk over an obstacle or wall
         if action == self.actions.forward and not_clear:
             reward = -1
